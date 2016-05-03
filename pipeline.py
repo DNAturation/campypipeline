@@ -3,20 +3,55 @@ import subprocess
 import argparse
 
 #name of the folder that stuff gets saved to
-PROJECTNAME = input(print("Please name the folder"))
-SEQUENCES = input(print("Please specify the files to assemble"))
+#PROJECTNAME = input(print("Please name the folder"))
+#SEQUENCES = input(print("Please specify the files to assemble"))
 
 #command for kraken, write classified output files from specified input files
 #KrakenCommand = "kraken --only-classified-output --classified-out ./{name}/Kraken/".format(name=PROJECTNAME)
-KrakenCommand = "kraken --classified-out output {INPUTFILE}"/ format(INPUTFILE=SEQUENCES)
-#command to specify path for kraken to write files to
-PROJECTPATH = "export KRAKEN_DB_PATH='home/user/{name}/Kraken/'". format(name=PROJECTNAME)
-#command to make path for kraken to write files to
-KRAKENDIR = "mkdir ~/{name}/Kraken/". format(name=PROJECTNAME)
 
-subprocess.call(KRAKENDIR)
-subprocess.call(PROJECTPATH)
-subprocess.call(KrakenCommand, stdin=None, stdout=None, stderr=subprocess.STDOUT, shell=True, timeout=None)
 
+def arguments():
+    '''Takes args from the user and parses them'''
+    parser = argparse.ArgumentParser
+    parser.add_argument()
+    return parser.parse_args()
+    pass
+
+
+#somehow need to stick version numbers run into each of these?
+def run_kraken():
+    '''Formats Kraken args and runs kraken'''
+    KrakenCommand = "kraken --db DBNAME --classified-out OUTPUTNAME {INPUTFILE}".format(INPUTFILE=SEQUENCES)
+    subprocess.call(KrakenCommand, stdin=None, stdout=None, stderr=None, shell=True, timeout=None)
+    pass
+
+
+def run_spades():
+    SPAdesCommand = "spades"
+    subprocess.call(SPAdesCommand, stdin=None, stdout=None, stderr=None, shell=True, timeout=None)
+    pass
+
+def run_mist():
+    MISTCommand = "mist {mistinput1} {mistinput2}".format(???)
+    subprocess.call (MISTCommand, stdin=None, stdout=None, stderr=None, shell=True, timeout=None)
+    pass
+
+def run_quast():
+    #quast not installed?
+    pass
+
+def run_prokka():
+    prokkaCommand = "prokka {prokkacontigs}".format()
+    subprocess.call (prokkaCommand, stdin=None, stdout=None, stderr=None, shell=True, timeout=None)
+    pass
+
+def run_panseq():
+    #not installed?
+    pass
+
+def run_roary():
+    roaryCommand = "roary {options} {roaryinput}".format(options=? roaryinput=?)
+    subprocess.call (roaryCommand, stdin=None, stdout=None, stderr=None, shell=True, timeout=None)
+    pass
 
 
