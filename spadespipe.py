@@ -2,26 +2,27 @@ import argparse
 import os
 import subprocess
 import glob
+import shutil
 
 def inputfastqs(path):
     listoffastq=glob.glob(path+'*.fastq')
     pairs = []
     for i, v in enumerate(listoffastq):
-        for match in range(i+1, len(lsitoffastq)):
+        for match in range(i+1, len(listoffastq)):
             compare = list(zip(v, listoffastq[match]))
             for pos, cv in enumerate(compare):
                 if cv[0] == cv[1]:
                     continue
                 elif cv[0] in '12' and compare[pos-1][0] == 'R':
-                    pairs.append((v, listoffastq[match]))
+                    pairs.append((v, listoffastq[match], path))
                 else:
                     break
+    return[t for t in pairs]
+    # return [t.append(path) for t in pairs]
 
-    return [sorted(t) for t in pairs]
 
 
-
-def namer(fast1, fast2): #gets strain names
+def namer(fast1, fast2, path): #gets strain names
     endposition = 0
     for i, v in enumerate(fast1):
         if fast1[i] == fast2[i]:
@@ -29,7 +30,7 @@ def namer(fast1, fast2): #gets strain names
             continue
         else:
             break
-    Strain_Name = fast1[:endposition-6]
+    Strain_Name = fast1[len(path):endposition-6]
     return Strain_Name
 
 def pathfinder(Output_Dir):
@@ -37,33 +38,45 @@ def pathfinder(Output_Dir):
         os.mkdir(Output_Dir)
 
 
-def fastapath():
-    if not os.access('./fasta/', os.F_OK):
-        os.mkdir('fasta/')
+def fastapath(fasta):
+    if not os.access(fasta, os.F_OK):
+        os.mkdir(fasta)
 
 
 def get_strain_names(file_pairs): #returns a list of strain names
     return [namer(*pair) for pair in file_pairs]
 
-def format_spades_args(strain_names, file_pairs, Output_Dir): # return a list of lists]
-    for i in file_pairs:
-        strain1 = file_pairs[i][0]
-        strain2 = file_pairs[i][1]
-        subprocess.call('spades.py -o OPL -1 STRAIN1 -2 STRAIN2 --careful --threads 32'.replace('OPL', Output_Dir)\
-                        .replace('STRAIN1', strain1)\
-                        .replace('STRAIN2', strain2))
-        subprocess.call('mv OPL/contigs.fasta /fasta/STRAINNAME.fasta'.replace('OPL', Output_Dir)\
-                        .replace('STRAINNAME', strain_names))
+def format_spades_args(strain_names, file_pairs, output_dir, fastaout, threads): # return a list of lists]
 
+        for strain, pair in zip(strain_names, file_pairs):
+            spades = ('spades.py',
+                   '-o', '{}/{}'.format(output_dir, strain),
+                   '-1', pair[0],
+                   '-2', pair[1],
+                   '--careful',
+                   '--threads', threads
+                   )
 
-def run_spades():
-    pass
+            src = '{out}/{strain}/contigs.fasta'.format(out=output_dir, strain=strain)
+            dst = '{fout}/{strain}.fasta'.format(fout=fastaout, strain=strain)
+
+            yield spades, src, dst
+
+def run_spades(strain_names, file_pairs, output_dir, fastaout, threads):
+
+    for spades, src, dst in format_spades_args(strain_names, file_pairs, output_dir, fastaout, threads):
+
+        subprocess.call(spades)
+        shutil.copy(src, dst)
 
 def arguments():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', nargs=1)
-    parser.add_argument('-o', '--outpath', required=False, default='./temprawout')
+
+    parser.add_argument('-o', '--outpath', default='./temprawout', help='output directory for all files')
+    parser.add_argument('-f', '--fastaout', default='./fasta/', help='output directory for fastas')
+    parser.add_argument('-t', '--threads', default='32')
+    parser.add_argument('path', help='directory of fastqs for input')
 
     return parser.parse_args()
 
@@ -71,13 +84,16 @@ def arguments():
 def main():
 
     args = arguments()
-    pathfinder(args.out)
-    fastapath()
+    # if not os.access('/home/phac/campypipeline/test/', os.F_OK):
+    if not os.access(args.path, os.F_OK):
+        print ('Directory not found')
+    pathfinder(args.outpath)
+    fastapath(args.fastaout)
+    # file_pairs = inputfastqs('/home/phac/campypipeline/test/')
     file_pairs = inputfastqs(args.path)
     names = get_strain_names(file_pairs)
-
-    format_spades_args(names, file_pairs, args.outpath)
-    run_spades()
+    # print ('names', names, 'filepairs', file_pairs, 'outpath', args.outpath, 'threads', args.threads)
+    run_spades(names, file_pairs, args.outpath, args.fastaout, args.threads)
 
 if __name__ == '__main__':
     main()
