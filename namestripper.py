@@ -8,20 +8,19 @@ import glob
 
 
 
-def dictionary(path):
-    fastalist = glob.glob(path+'*.fasta')
-    for file in fastalist:
-        d={}
-        prokkafriendlyd={}
-        # pattern = '\/([^\/])+$'
-        # strain = path[[m.start() for m in re.finditer(pattern, path)]:]
-        strain = strain_name(file)
-        with open(file, 'r') as f:
-            for record in SeqIO.parse(f, 'fasta'):
-                d[record.id] = str(record.seq)
-        for i, v in enumerate(sorted(d)):
-            prokkafriendlyd[strain + str(i).zfill(5)] = d[v]
-        yield prokkafriendlyd
+def dictionary(file):
+
+    d={}
+    prokkafriendlyd={}
+    # pattern = '\/([^\/])+$'
+    # strain = path[[m.start() for m in re.finditer(pattern, path)]:]
+    strain = strain_name(file)
+    with open(file, 'r') as f:
+        for record in SeqIO.parse(f, 'fasta'):
+            d[record.id] = str(record.seq)
+    for i, v in enumerate(sorted(d)):
+        prokkafriendlyd[strain + str(i).zfill(5)] = d[v]
+    return prokkafriendlyd
 
 def seqobject(pfd):
     record = ([SeqRecord(Seq(pfd[k], IUPAC.unambiguous_dna), id=k) for k in sorted(pfd)])
@@ -33,7 +32,7 @@ def pathfinder(outdir):
 
 def writer(record, outpath, strain):
 
-    outputhandle = open(outpath+'/'+strain+'prokka.fasta', 'w+')
+    outputhandle = open('{}/{}.fasta'.format(outpath, strain), 'w+')
     SeqIO.write(record, outputhandle, 'fasta')
     outputhandle.close()
 
@@ -45,22 +44,21 @@ def arguments():
 
     return parser.parse_args()
 
-def strain_name(s):
-    st = glob.glob(s+'*.fasta')
-    for v in st:
-        yield os.path.splitext(os.path.basename(v))[0]
+def strain_name(st):
+    return os.path.splitext(os.path.basename(st))[0]
 
 def main():
     args = arguments()
     # pattern = '\/([^\/])+$'
 
     # strain = args.path[[m.start() for m in re.finditer(pattern, args.path)]:]
-    strain = strain_name(args.path)
-
     pathfinder(args.outpath)
-    pfd = dictionary(args.path)
-    record = seqobject(pfd)
-    writer(record, args.outpath, strain)
+    x = glob.glob(args.path+'*.fasta')
+    for a in x:
+        strain = strain_name(a)
+        pfd = dictionary(a)
+        record = seqobject(pfd)
+        writer(record, args.outpath, strain)
 
 if __name__ == '__main__':
     main()
