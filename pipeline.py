@@ -3,7 +3,7 @@ import subprocess
 import argparse
 
 #name of the folder that stuff gets saved to
-#PROJECTNAME = input(print("Please name the folder"))
+#PROJECTNAME =
 #SEQUENCES = input(print("Please specify the files to assemble"))
 
 #command for kraken, write classified output files from specified input files
@@ -21,14 +21,21 @@ def arguments():
 #somehow need to stick version numbers run into each of these?
 def run_kraken():
     '''Formats Kraken args and runs kraken'''
-    KrakenCommand = "kraken --db DBNAME --classified-out OUTPUTNAME {INPUTFILE}".format(INPUTFILE=SEQUENCES)
+    KrakenCommand = "kraken --db DBNAME --classified-out OUTPUTNAME {INPUTFILE}".format(INPUTFILE=input())
     subprocess.call(KrakenCommand, stdin=None, stdout=None, stderr=None, shell=True, timeout=None)
     pass
 
 
 def run_spades():
-    SPAdesCommand = "spades"
+    FILENAME1 = "*1_001\.fastq"
+    FILENAME2 = "*2_001\.fastq"
+    SPAdesCommand = "spades.py {INPUTFILE}".format(INPUTFILE=FILENAME1 +FILENAME2)
     subprocess.call(SPAdesCommand, stdin=None, stdout=None, stderr=None, shell=True, timeout=None)
+        FASTASTORAGEDIRECTORY =
+        #STRAIN=?(*_S[0-9]+_L001_[R, L][1-2]_001\.fastq)
+        STRAINNAME=FILENAME1[0:-21]
+        os.rename(contigs.fasta, os.path.expanduser(~)/FASTASTORAGEDIRECTORY/STRAINNAME)
+
     pass
 
 def run_mist():
@@ -54,4 +61,7 @@ def run_roary():
     subprocess.call (roaryCommand, stdin=None, stdout=None, stderr=None, shell=True, timeout=None)
     pass
 
+run_kraken() INPUTFILE=input()
+
+run_spades()
 
