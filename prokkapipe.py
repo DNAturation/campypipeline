@@ -1,3 +1,5 @@
+#takes in fasta files from spades/namestripper and outputs .gff files for roary
+
 import os
 import argparse
 import glob

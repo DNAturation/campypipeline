@@ -1,3 +1,5 @@
+#takes a group of .gff files from prokka and outputs
+
 import argparse
 import glob
 import os
@@ -5,10 +7,10 @@ import subprocess
 from multiprocessing import cpu_count
 
 def gff(path, temp):
-    listofiles = glob.iglob(path+'*/*.gff')
+    listofiles = glob.glob(path+'*/*.gff')
     for src in listofiles:
 
-        strain, b = os.path.splitext(os.path.basename(src))
+        strain, extension = os.path.splitext(os.path.basename(src))
         dst = temp + strain + '.gff'
 
         if os.access(dst, os.F_OK):
@@ -23,16 +25,21 @@ def pathfinder(out_dir):
 
 
 def roaryargs(threads, out_dir, temp):
-    for infiles in glob.iglob(temp + '*.gff'):
-        roary = ('roary',
-                '-p', str(threads),
-                 '-f', out_dir,
-                 infiles)
-        yield roary
+    listoffiles = glob.glob(temp + '*.gff')
+    files = " ".join(str(files) for files in listoffiles)
+    roary = 'roary '+'-p '+str(threads)+' -f '+out_dir+' '+files
+    # roary = ('roary',
+    #          '-p', '{}'.format(str(threads)),
+    #          '-f', '{}'.format(out_dir),
+    #          files
+    #          )
+    # yield roary
+    return roary
 
 def runroary(threads, out_dir, temp):
-    for roary in roaryargs(threads, out_dir, temp):
-        subprocess.call(roary)
+    # for roary in roaryargs(threads, out_dir, temp):
+    #     subprocess.call(roary)
+    subprocess.call(roaryargs(threads, out_dir, temp), shell=True)
 
 
 

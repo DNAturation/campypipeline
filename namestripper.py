@@ -1,3 +1,5 @@
+#takes in fasta files from spades output and alters contig names to allow prokka to run
+
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
