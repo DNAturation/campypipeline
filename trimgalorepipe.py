@@ -36,6 +36,12 @@ def runtrimP(fastqinput, outpath):
     for trims in trimargP(fastqinput, outpath):
         subprocess.call(trims)
 
+def rename(outpath):
+    outlist = glob.glob(outpath + '*.fq')
+    for file in outlist:
+        strain, extension = os.path.splitext(os.path.basename(file))
+        os.rename(file, outpath+strain+'.fastq')
+
 def arguments():
     parser = argparse.ArgumentParser()
 
@@ -51,6 +57,7 @@ def process(path, outpath, UP):
         runtrimU(fastqinput, outpath)
     else:
         runtrimP(fastqinput, outpath)
+    rename(outpath)
 
 
 
