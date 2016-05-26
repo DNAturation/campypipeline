@@ -49,18 +49,29 @@ def arguments():
 def strain_name(st):
     return os.path.splitext(os.path.basename(st))[0]
 
-def main():
-    args = arguments()
-    # pattern = '\/([^\/])+$'
+def process(path, outpath):
 
-    # strain = args.path[[m.start() for m in re.finditer(pattern, args.path)]:]
-    pathfinder(args.outpath)
-    x = glob.glob(args.path+'*.fasta')
+    pathfinder(outpath)
+    x = glob.glob(path+'*.fasta')
     for a in x:
         strain = strain_name(a)
         pfd = dictionary(a)
         record = seqobject(pfd)
-        writer(record, args.outpath, strain)
+        writer(record, outpath, strain)
+
+def main():
+    args = arguments()
+    process(args.path, args.outpath)
+    # pattern = '\/([^\/])+$'
+
+    # strain = args.path[[m.start() for m in re.finditer(pattern, args.path)]:]
+    # pathfinder(args.outpath)
+    # x = glob.glob(args.path+'*.fasta')
+    # for a in x:
+    #     strain = strain_name(a)
+    #     pfd = dictionary(a)
+    #     record = seqobject(pfd)
+    #     writer(record, args.outpath, strain)
 
 if __name__ == '__main__':
     main()

@@ -3,6 +3,7 @@ import os
 import subprocess
 import glob
 import shutil
+from multiprocessing import cpu_count
 
 def inputfastqs(path):
     listoffastq=glob.glob(path+'*.fastq')
@@ -34,7 +35,7 @@ def namer(fast1, fast2, path): #gets strain names
     return Strain_Name
 
 def pathfinder(Output_Dir):
-    if not os.access('./' + Output_Dir, os.F_OK):
+    if not os.access(Output_Dir, os.F_OK):
         os.mkdir(Output_Dir)
 
 
@@ -64,7 +65,7 @@ def format_spades_args(strain_names, file_pairs, output_dir, fastaout, threads):
 
 def run_spades(strain_names, file_pairs, output_dir, fastaout, threads):
 
-    for spades, src, dst in format_spades_args(strain_names, file_pairs, output_dir, fastaout, threads):
+    for spades, src, dst in format_spades_args(strain_names, file_pairs, output_dir, fastaout, str(threads)):
 
         subprocess.call(spades)
         shutil.copy(src, dst)
@@ -75,25 +76,37 @@ def arguments():
 
     parser.add_argument('-o', '--outpath', default='./temprawout', help='output directory for all files')
     parser.add_argument('-f', '--fastaout', default='./fasta/', help='output directory for fastas')
-    parser.add_argument('-t', '--threads', default='32')
+    parser.add_argument('-t', '--threads', type=int, default=cpu_count())
     parser.add_argument('path', help='directory of fastqs for input')
 
     return parser.parse_args()
+
+def process(path, outpath, fastaout, threads):
+    if not os.access(path, os.F_OK):
+        print ('Error: FastQ directory not found')
+    pathfinder(outpath)
+    fastapath(fastaout)
+    # file_pairs = inputfastqs('/home/phac/campypipeline/test/')
+    file_pairs = inputfastqs(path)
+    names = get_strain_names(file_pairs)
+    # print ('names', names, 'filepairs', file_pairs, 'outpath', args.outpath, 'threads', args.threads)
+    run_spades(names, file_pairs, outpath, fastaout, threads)
 
 
 def main():
 
     args = arguments()
+    process(args.path, args.outpath, args.fastaout, args.threads)
     # if not os.access('/home/phac/campypipeline/test/', os.F_OK):
-    if not os.access(args.path, os.F_OK):
-        print ('Directory not found')
-    pathfinder(args.outpath)
-    fastapath(args.fastaout)
-    # file_pairs = inputfastqs('/home/phac/campypipeline/test/')
-    file_pairs = inputfastqs(args.path)
-    names = get_strain_names(file_pairs)
-    # print ('names', names, 'filepairs', file_pairs, 'outpath', args.outpath, 'threads', args.threads)
-    run_spades(names, file_pairs, args.outpath, args.fastaout, args.threads)
+    # if not os.access(args.path, os.F_OK):
+    #     print ('Directory not found')
+    # pathfinder(args.outpath)
+    # fastapath(args.fastaout)
+    # # file_pairs = inputfastqs('/home/phac/campypipeline/test/')
+    # file_pairs = inputfastqs(args.path)
+    # names = get_strain_names(file_pairs)
+    # # print ('names', names, 'filepairs', file_pairs, 'outpath', args.outpath, 'threads', args.threads)
+    # run_spades(names, file_pairs, args.outpath, args.fastaout, args.threads)
 
 if __name__ == '__main__':
     main()

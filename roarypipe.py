@@ -8,6 +8,7 @@ from multiprocessing import cpu_count
 
 def gff(path, temp):
     listofiles = glob.glob(path+'*/*.gff')
+    print (listofiles)
     for src in listofiles:
 
         strain, extension = os.path.splitext(os.path.basename(src))
@@ -48,21 +49,30 @@ def arguments():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-o', '--outpath', default='roaryout/')
-    parser.add_argument('-t', '--temp', default='gffs/')
+    parser.add_argument('-o', '--outpath', default='./roaryout/')
+    parser.add_argument('-t', '--temp', default='./gffs/')
     parser.add_argument('-p', '--processors', type=int, default=cpu_count())
     parser.add_argument('path')
 
     return parser.parse_args()
 
+def process(path, outpath, temp, processors):
+    pathfinder(outpath)
+    pathfinder(temp)
+
+    gff(path, temp)
+    runroary(processors, outpath, temp)
+
+
 def main():
     args = arguments()
+    process(args.path, args.outpath, args.temp, args.processors)
 
-    pathfinder(args.outpath)
-    pathfinder(args.temp)
-
-    gff(args.path, args.temp)
-    runroary(args.processors, args.outpath, args.temp)
+    # pathfinder(args.outpath)
+    # pathfinder(args.temp)
+    #
+    # gff(args.path, args.temp)
+    # runroary(args.processors, args.outpath, args.temp)
 
 if __name__ == '__main__':
     main()
