@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 import subprocess
+import trimgalorepipe
 import argparse
 import spadespipe
 import namestripper
@@ -10,7 +11,8 @@ import quastpipe
 from multiprocessing import cpu_count
 
 
-
+def run_trimgalore(path, outpath, UP):
+    trimgalorepipe.process(path, outpath, UP)
 
 def run_kraken():
     '''Formats Kraken args and runs kraken'''
@@ -42,7 +44,8 @@ def run_roary(path, outpath, temp, processors):
 
 def arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('spadesin', help='directory of fastQs')
+    parser.add_argument('trimin', help='raw fastq reads')
+    parser.add_argument('-To', '--trimout', default='./cleanfastQs/' help='directory of trimmed fastQs')
     parser.add_argument('-t', '--threads', type=int, default=cpu_count())
     parser.add_argument('-SPo', '--spadesout', default='./temprawout', help='output directory for all files')
     parser.add_argument('-f', '--fasta', default='./fasta/', help='output directory for fastas')
@@ -57,13 +60,8 @@ def arguments():
 
 def main():
     args = arguments()
-    if args.unpaired==True:
-        #unpaired trim
-        pass
-    else:
-        #paired flag for trim
-        pass
-    run_spades(args.spadesin, args.spadesout, args.fasta, str(args.threads))
+    run_trimgalore(args.trimin, args.trimout, args.unpaired)
+    run_spades(args.trimout, args.spadesout, args.fasta, str(args.threads))
     run_quast(args.fasta, args.quastout, str(args.threads))
     run_prokka(args.fasta, args.namestripperout, args.prokkaout, str(args.threads))
     run_roary(args.prokkaout, args.roaryout, args.roarysym, str(args.threads))
