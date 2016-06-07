@@ -54,10 +54,6 @@ def process(path, outpath, threads):
 def main():
     args = arguments()
     process(args.path, args.outpath, args.threads)
-    # pathfinder(args.outpath)
-    # infa = inputfasta(args.path)
-    # strain_name = straingetter(infa, args.path)
-    # run_quast(infa, strain_name, args.outpath, args.threads)
 
 if __name__ == '__main__':
     main()

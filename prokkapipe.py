@@ -8,7 +8,6 @@ from multiprocessing import cpu_count
 
 def input_strains(fasta_path):
     for v in glob.glob(fasta_path + '*.fasta'):
-        # print ('instrains', v, os.path.splitext(os.path.basename(v))[0])
         yield v, os.path.splitext(os.path.basename(v))[0]
 
 def pathfinder(outdir):
@@ -22,14 +21,12 @@ def prokkargs(strain, fasta, outpath, cores):
             '--prefix', strain,
             '--cpus', str(cores),
             fasta)
-    # print('prokkargs', prok)
 
     return prok
 
 def runprokka(strain, fasta, outpath, cores):
 
     prok = prokkargs(strain, fasta, outpath, cores)
-    # print('runprok', prok)
     subprocess.call(prok)
 
 def arguments():
@@ -44,22 +41,14 @@ def arguments():
 
 def process(path, outpath, cpus):
     pathfinder(outpath)
-    # print('process', path, outpath)
 
     for fasta, strain in input_strains(path):
-        # print ('meh', strain, fasta, outpath)
         runprokka(strain, fasta, outpath, cpus)
 
 def main():
 
     args = arguments()
-    # print ('args', args)
     process(args.path, args.outpath, args.cpus)
-    # pathfinder(args.outpath)
-    # print(args)
-    #
-    # for fasta, strain in input_strains(args.path):
-    #     runprokka(strain, fasta, args.outpath, args.cpus)
 
 if __name__ == '__main__':
     main()

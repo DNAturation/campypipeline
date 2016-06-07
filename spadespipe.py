@@ -19,19 +19,13 @@ def inputfastqs(path):
                 else:
                     break
     return[t for t in pairs]
-    # return [t.append(path) for t in pairs]
 
 
 
-def namer(fast1, fast2, path): #gets strain names
-    endposition = 0
-    for i, v in enumerate(fast1):
-        if fast1[i] == fast2[i]:
-            endposition = i
-            continue
-        else:
-            break
-    Strain_Name = fast1[len(path):endposition-6]
+
+def namer(fast1): #gets strain names
+    strain, extension = os.path.splitext(os.path.basename(fast1))
+    Strain_Name = strain[:-6]
     return Strain_Name
 
 def pathfinder(Output_Dir):
@@ -44,8 +38,9 @@ def fastapath(fasta):
         os.mkdir(fasta)
 
 
-def get_strain_names(file_pairs): #returns a list of strain names
-    return [namer(*pair) for pair in file_pairs]
+
+def get_strain_names(file): #return a list of strain names
+    return (namer(x[0]) for x in file)
 
 def format_spades_args(strain_names, file_pairs, output_dir, fastaout, threads): # return a list of lists]
 
@@ -86,10 +81,8 @@ def process(path, outpath, fastaout, threads):
         print ('Error: FastQ directory not found')
     pathfinder(outpath)
     fastapath(fastaout)
-    # file_pairs = inputfastqs('/home/phac/campypipeline/test/')
     file_pairs = inputfastqs(path)
     names = get_strain_names(file_pairs)
-    # print ('names', names, 'filepairs', file_pairs, 'outpath', args.outpath, 'threads', args.threads)
     run_spades(names, file_pairs, outpath, fastaout, threads)
 
 
@@ -97,16 +90,7 @@ def main():
 
     args = arguments()
     process(args.path, args.outpath, args.fastaout, args.threads)
-    # if not os.access('/home/phac/campypipeline/test/', os.F_OK):
-    # if not os.access(args.path, os.F_OK):
-    #     print ('Directory not found')
-    # pathfinder(args.outpath)
-    # fastapath(args.fastaout)
-    # # file_pairs = inputfastqs('/home/phac/campypipeline/test/')
-    # file_pairs = inputfastqs(args.path)
-    # names = get_strain_names(file_pairs)
-    # # print ('names', names, 'filepairs', file_pairs, 'outpath', args.outpath, 'threads', args.threads)
-    # run_spades(names, file_pairs, args.outpath, args.fastaout, args.threads)
+
 
 if __name__ == '__main__':
     main()

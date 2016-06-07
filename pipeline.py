@@ -45,7 +45,7 @@ def run_roary(path, outpath, temp, processors):
 def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('trimin', help='raw fastq reads')
-    parser.add_argument('-To', '--trimout', default='./cleanfastQs/' help='directory of trimmed fastQs')
+    parser.add_argument('-To', '--trimout', default='./cleanfastQs/', help='directory of trimmed fastQs')
     parser.add_argument('-t', '--threads', type=int, default=cpu_count())
     parser.add_argument('-SPo', '--spadesout', default='./temprawout', help='output directory for all files')
     parser.add_argument('-f', '--fasta', default='./fasta/', help='output directory for fastas')

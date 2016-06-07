@@ -14,8 +14,7 @@ def dictionary(file):
 
     d={}
     prokkafriendlyd={}
-    # pattern = '\/([^\/])+$'
-    # strain = path[[m.start() for m in re.finditer(pattern, path)]:]
+
     strain = strain_name(file)
     with open(file, 'r') as f:
         for record in SeqIO.parse(f, 'fasta'):
@@ -62,16 +61,7 @@ def process(path, outpath):
 def main():
     args = arguments()
     process(args.path, args.outpath)
-    # pattern = '\/([^\/])+$'
 
-    # strain = args.path[[m.start() for m in re.finditer(pattern, args.path)]:]
-    # pathfinder(args.outpath)
-    # x = glob.glob(args.path+'*.fasta')
-    # for a in x:
-    #     strain = strain_name(a)
-    #     pfd = dictionary(a)
-    #     record = seqobject(pfd)
-    #     writer(record, args.outpath, strain)
 
 if __name__ == '__main__':
     main()
