@@ -40,7 +40,7 @@ def pathfinder(out_dir):
 
 def roaryargs(threads, out_dir, temp, x):
     '''grabs all symlinked files, and organizes them into a space delimited string for input into roary'''
-    listoffiles = glob.glob(temp[:-1]+x+'/' + '*.gff')
+    listoffiles = glob.glob(temp[:-1]+str(x)+'/' + '*.gff')
     files = " ".join(str(files) for files in listoffiles)
     roary = 'roary '+'-p '+str(threads)+' -f '+out_dir+' '+files
 
