@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import os
-import subprocess
 import trimgalorepipe
 import argparse
 import spadespipe
@@ -8,11 +7,12 @@ import namestripper
 import prokkapipe
 import roarypipe
 import quastpipe
+import mistpipe
 from multiprocessing import cpu_count
 
 
-def run_trimgalore(path, outpath, UP):
-    trimgalorepipe.process(path, outpath, UP)
+def run_trimgalore(path, outpath):
+    trimgalorepipe.process(path, outpath)
 
 def run_kraken():
     '''Formats Kraken args and runs kraken'''
@@ -23,10 +23,8 @@ def run_kraken():
 def run_spades(spadesin, spadesout, spadesfastaout, threads):
     spadespipe.process(spadesin, spadesout, spadesfastaout, threads)
 
-# def run_mist():
-#     MISTCommand = "mist {mistinput1} {mistinput2}".format(???)
-#     subprocess.call (MISTCommand, stdin=None, stdout=None, stderr=None, shell=True, timeout=None)
-#     pass
+def run_mist(path, outpath, testtypename, testtype, alleles, cores):
+    mistpipe.process(path, outpath, testtypename, testtype, alleles, cores)
 
 def run_quast(path, outpath, threads):
     quastpipe.process(path, outpath, threads)
@@ -45,26 +43,30 @@ def run_roary(path, outpath, temp, processors):
 def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('trimin', help='raw fastq reads')
-    parser.add_argument('-To', '--trimout', default='./cleanfastQs/', help='directory of trimmed fastQs')
-    parser.add_argument('-t', '--threads', type=int, default=cpu_count())
-    parser.add_argument('-SPo', '--spadesout', default='./temprawout', help='output directory for all files')
-    parser.add_argument('-f', '--fasta', default='./fasta/', help='output directory for fastas')
-    parser.add_argument('-Qo', '--quastout', default='./quastout/')
-    parser.add_argument('-NSo', '--namestripperout', default='./prokka/')
-    parser.add_argument('-Po', '--prokkaout', default='./prokka/')
-    parser.add_argument('-Ro', '--roaryout', default='./roaryout/')
-    parser.add_argument('-Rs', '--roarysym', default='./gffs/')
-    parser.add_argument('-UP', '--unpaired', action='store_true')
+    parser.add_argument('--trimout', default='cleanfastQs/', help='directory of trimmed fastQs')
+    parser.add_argument('-c', '--cores', type=int, default=cpu_count())
+    parser.add_argument('--spadesout', default='temprawout', help='output directory for all files')
+    parser.add_argument('-f', '--fasta', default='fasta/', help='output directory for fastas')
+    parser.add_argument('--quastout', default='quastout/')
+    parser.add_argument('--namestripperout', default='prokka/')
+    parser.add_argument('--prokkaout', default='prokka/')
+    parser.add_argument('--roaryout', default='roaryout/')
+    parser.add_argument('--roarysym', default='gffs/')
+    parser.add_argument('--mistout', default='mistout/')
+    parser.add_argument('-t', '--testtypename', help='name of test being run')
+    parser.add_argument('-m', '--marker', help='path to and name of .markers file being run')
+    parser.add_argument('-a', '--alleles', help='folder for alleles files')
     return parser.parse_args()
 
 
 def main():
     args = arguments()
-    run_trimgalore(args.trimin, args.trimout, args.unpaired)
-    run_spades(args.trimout, args.spadesout, args.fasta, str(args.threads))
-    run_quast(args.fasta, args.quastout, str(args.threads))
-    run_prokka(args.fasta, args.namestripperout, args.prokkaout, str(args.threads))
-    run_roary(args.prokkaout, args.roaryout, args.roarysym, str(args.threads))
+    run_trimgalore(args.trimin, args.trimout)
+    run_spades(args.trimout, args.spadesout, args.fasta, str(args.cores))
+    run_quast(args.fasta, args.quastout, str(args.cores))
+    run_mist(args.quastout, args.mistout, args.testtypename, args.marker, args.alleles, args.cores)
+    run_prokka(args.fasta, args.namestripperout, args.prokkaout, str(args.cores))
+    run_roary(args.prokkaout, args.roaryout, args.roarysym, str(args.cores))
 
 
 if __name__ == '__main__':

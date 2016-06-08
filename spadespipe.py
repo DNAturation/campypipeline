@@ -1,3 +1,6 @@
+#takes in fastq files that have had their adapters trimmed by trimgalore and
+# runs spades on them, outputting fasta files
+
 import argparse
 import os
 import subprocess
@@ -6,6 +9,7 @@ import shutil
 from multiprocessing import cpu_count
 
 def inputfastqs(path):
+    '''grabs fastq files from input path and sorts them into forward and reverse pair tuples'''
     listoffastq=glob.glob(path+'*.fastq')
     pairs = []
     for i, v in enumerate(listoffastq):
@@ -23,7 +27,8 @@ def inputfastqs(path):
 
 
 
-def namer(fast1): #gets strain names
+def namer(fast1):
+    '''gets strain names'''
     strain, extension = os.path.splitext(os.path.basename(fast1))
     Strain_Name = strain[:-6]
     return Strain_Name
@@ -39,31 +44,36 @@ def fastapath(fasta):
 
 
 
-def get_strain_names(file): #return a list of strain names
+def get_strain_names(file):
+    '''retrieves strain names from the paired tuples'''
     return (namer(x[0]) for x in file)
 
-def format_spades_args(strain_names, file_pairs, output_dir, fastaout, threads): # return a list of lists]
+def format_spades_args(strain_names, file_pairs, output_dir, fastaout, threads):
+    '''creates arguments for calling spades, list of tuples'''
+    for strain, pair in zip(strain_names, file_pairs):
+        spades = ('spades.py',
+               '-o', '{}/{}'.format(output_dir, strain),
+               '-1', pair[0],
+               '-2', pair[1],
+               '--careful',
+               '--threads', threads
+               )
 
-        for strain, pair in zip(strain_names, file_pairs):
-            spades = ('spades.py',
-                   '-o', '{}/{}'.format(output_dir, strain),
-                   '-1', pair[0],
-                   '-2', pair[1],
-                   '--careful',
-                   '--threads', threads
-                   )
+        src = '{out}/{strain}/contigs.fasta'.format(out=output_dir, strain=strain)
+        dst = '{fout}/{strain}.fasta'.format(fout=fastaout, strain=strain)
 
-            src = '{out}/{strain}/contigs.fasta'.format(out=output_dir, strain=strain)
-            dst = '{fout}/{strain}.fasta'.format(fout=fastaout, strain=strain)
-
-            yield spades, src, dst
+        yield spades, src, dst
 
 def run_spades(strain_names, file_pairs, output_dir, fastaout, threads):
-
+    '''runs spades on the provided arguments from spades args; if fasta file for strain
+     already exists, skips the file'''
     for spades, src, dst in format_spades_args(strain_names, file_pairs, output_dir, fastaout, str(threads)):
+        if not os.path.isfile(dst):
 
-        subprocess.call(spades)
-        shutil.copy(src, dst)
+            subprocess.call(spades)
+            shutil.copy(src, dst)
+        else:
+            print(dst+' already exists! Skipping strain.')
 
 def arguments():
 
