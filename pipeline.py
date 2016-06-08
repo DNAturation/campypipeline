@@ -61,9 +61,9 @@ def arguments():
 
 def main():
     args = arguments()
-    # run_trimgalore(args.trimin, args.trimout)
-    # run_spades(args.trimout, args.spadesout, args.fasta, str(args.cores))
-    # run_quast(args.fasta, args.quastout, str(args.cores))
+    run_trimgalore(args.trimin, args.trimout)
+    run_spades(args.trimout, args.spadesout, args.fasta, str(args.cores))
+    run_quast(args.fasta, args.quastout, str(args.cores))
     run_mist(args.fasta, args.mistout, args.testtypename, args.marker, args.alleles, args.cores)
     run_prokka(args.fasta, args.namestripperout, args.prokkaout, str(args.cores))
     run_roary(args.prokkaout, args.roaryout, args.roarysym, str(args.cores))
