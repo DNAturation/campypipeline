@@ -10,9 +10,9 @@ import shutil
 
 def getfasta(path):
     fastalist = []
-    for x in path:
-        blurgh = glob.glob(x+'*.fasta')
-        fastalist.append(blurgh)
+    blurgh = glob.glob(path+'*.fasta')
+    for file in blurgh:
+        fastalist.append(file)
     return fastalist
 
 
@@ -64,11 +64,10 @@ def arguments():
 def process(path, outpath, testtypename, testtype, alleles, cores):
     listlist = getfasta(path)
     pool = multiprocessing.Pool(int(cores))
-    for fastalist in listlist:
-        pathfinder(outpath)
-        margs = mistargs(fastalist, outpath, testtypename, testtype, alleles)
-        for missed, strain in margs:
-            pool.apply_async(runmist, args=(missed, outpath, strain))
+    pathfinder(outpath)
+    margs = mistargs(listlist, outpath, testtypename, testtype, alleles)
+    for missed, strain in margs:
+        pool.apply_async(runmist, args=(missed, outpath, strain))
     pool.close()
     pool.join()
 

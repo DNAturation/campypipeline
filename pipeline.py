@@ -45,8 +45,8 @@ def arguments():
     parser.add_argument('trimin', help='raw fastq reads')
     parser.add_argument('--trimout', default='cleanfastQs/', help='directory of trimmed fastQs')
     parser.add_argument('-c', '--cores', type=int, default=cpu_count())
-    parser.add_argument('--spadesout', default='temprawout', help='output directory for all files')
-    parser.add_argument('-f', '--fasta', default='fasta/', help='output directory for fastas')
+    parser.add_argument('--spadesout', default='temprawout/', help='output directory for all files')
+    parser.add_argument('-f', '--fasta', default='fasta/', nargs='+', help='output directory for fastas')
     parser.add_argument('--quastout', default='quastout/')
     parser.add_argument('--namestripperout', default='prokka/')
     parser.add_argument('--prokkaout', default='prokka/')
@@ -61,10 +61,10 @@ def arguments():
 
 def main():
     args = arguments()
-    run_trimgalore(args.trimin, args.trimout)
-    run_spades(args.trimout, args.spadesout, args.fasta, str(args.cores))
-    run_quast(args.fasta, args.quastout, str(args.cores))
-    run_mist(args.quastout, args.mistout, args.testtypename, args.marker, args.alleles, args.cores)
+    # run_trimgalore(args.trimin, args.trimout)
+    # run_spades(args.trimout, args.spadesout, args.fasta, str(args.cores))
+    # run_quast(args.fasta, args.quastout, str(args.cores))
+    run_mist(args.fasta, args.mistout, args.testtypename, args.marker, args.alleles, args.cores)
     run_prokka(args.fasta, args.namestripperout, args.prokkaout, str(args.cores))
     run_roary(args.prokkaout, args.roaryout, args.roarysym, str(args.cores))
 
