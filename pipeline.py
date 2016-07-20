@@ -23,8 +23,8 @@ def run_kraken():
 def run_spades(spadesin, spadesout, spadesfastaout, threads):
     spadespipe.process(spadesin, spadesout, spadesfastaout, threads)
 
-def run_mist(path, outpath, testtypename, testtype, alleles, cores):
-    mistpipe.process(path, outpath, testtypename, testtype, alleles, cores)
+def run_mist(path, outpath, testtype, alleles, cores):
+    mistpipe.process(path, outpath, testtype, alleles, cores)
 
 def run_quast(path, outpath, threads):
     quastpipe.process(path, outpath, threads)
@@ -53,7 +53,6 @@ def arguments():
     parser.add_argument('--roaryout', default='roaryout/')
     parser.add_argument('--roarysym', default='gffs/')
     parser.add_argument('--mistout', default='mistout/')
-    parser.add_argument('-t', '--testtypename', help='name of test being run')
     parser.add_argument('-m', '--marker', help='path to and name of .markers file being run')
     parser.add_argument('-a', '--alleles', help='folder for alleles files')
     return parser.parse_args()
@@ -64,7 +63,7 @@ def main():
     run_trimgalore(args.trimin, args.trimout)
     run_spades(args.trimout, args.spadesout, args.fasta, str(args.cores))
     run_quast(args.fasta, args.quastout, str(args.cores))
-    run_mist(args.fasta, args.mistout, args.testtypename, args.marker, args.alleles, args.cores)
+    run_mist(args.fasta, args.mistout, args.marker, args.alleles, args.cores)
     run_prokka(args.fasta, args.namestripperout, args.prokkaout, str(args.cores))
     run_roary(args.prokkaout, args.roaryout, args.roarysym, str(args.cores))
 

@@ -7,6 +7,7 @@ import glob
 import subprocess
 import multiprocessing
 import shutil
+import csv
 
 def getfasta(path):
     fastalist = []
@@ -38,6 +39,13 @@ def mistargs(fastalist, outpath, testtypename, testtype, alleles):
         else:
             print('skipping strain '+strain+' due to .json file for this test already existing')
 
+def testnamegetter(testtype):
+    with open(testtype, 'r') as f:
+        reader=csv.reader(f, delimiter='\t')
+        next(reader, None)
+        for x in reader:
+            testname=x[1]
+            return testname
 
 def runmist(missed, outpath, strain):
     if not os.access(outpath+'temp/'+strain+'/', os.F_OK):
@@ -54,15 +62,15 @@ def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--outpath', default='./mistout/')
     parser.add_argument('-a', '--alleles', default='alleles/')
-    parser.add_argument('-T', '--testtypename', required=True, help='name of test run')
     parser.add_argument('-t', '--testtype', required=True, help='path to and type of test/markers file, ex. CGF119')
     parser.add_argument('-c', '--cores', default=multiprocessing.cpu_count(), help='number of cores to run on')
     parser.add_argument('path', nargs='+')
     return parser.parse_args()
 
 
-def process(path, outpath, testtypename, testtype, alleles, cores):
+def process(path, outpath, testtype, alleles, cores):
     listlist = getfasta(path)
+    testtypename=testnamegetter(testtype)
     pool = multiprocessing.Pool(int(cores))
     pathfinder(outpath)
     margs = mistargs(listlist, outpath, testtypename, testtype, alleles)
@@ -74,7 +82,7 @@ def process(path, outpath, testtypename, testtype, alleles, cores):
 
 def main():
     args = arguments()
-    process(args.path, args.outpath, args.testtypename, args.testtype, args.alleles, args.cores)
+    process(args.path, args.outpath, args.testtype, args.alleles, args.cores)
 
 if __name__ == '__main__':
     main()
