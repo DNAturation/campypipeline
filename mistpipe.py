@@ -8,6 +8,8 @@ import subprocess
 import multiprocessing
 import shutil
 import csv
+import re
+import json
 
 def getfasta(path):
     fastalist = []
@@ -41,11 +43,19 @@ def mistargs(fastalist, outpath, testtypename, testtype, alleles):
 
 def testnamegetter(testtype):
     with open(testtype, 'r') as f:
-        reader=csv.reader(f, delimiter='\t')
-        next(reader, None)
-        for x in reader:
-            testname=x[1]
-            return testname
+        try: #try accessing markers file as .json file first
+            data = json.load(f)
+            for genome, keys in data.items():
+                for key in keys:
+                    if re.match('T(est)?\.?[-\._ ]?Name.*', key, flags=re.IGNORECASE):
+                        return keys[key]
+
+        except KeyError: #if access as .json file fails, try to access as csv file
+            reader=csv.reader(f, delimiter='\t')
+            next(reader, None)
+            for x in reader:
+                testname=x[1]
+                return testname
 
 def runmist(missed, outpath, strain):
     if not os.access(outpath+'temp/'+strain+'/', os.F_OK):
