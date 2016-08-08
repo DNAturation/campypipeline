@@ -13,9 +13,10 @@ import json
 
 def getfasta(path):
     fastalist = []
-    blurgh = glob.glob(path+'*.fasta')
-    for file in blurgh:
-        fastalist.append(file)
+    for dir in path:
+        filelist = glob.glob(os.path.join(dir, '*.fasta'))  # path is a list of directories due to nargs argument
+        for file in filelist:
+            fastalist.append(file)
     return fastalist
 
 
@@ -30,7 +31,6 @@ def mistargs(fastalist, outpath, testtypename, testtype, alleles):
     for file in fastalist:
         strain, extension = os.path.splitext(os.path.basename(file))
         if not os.path.isfile(outpath+strain+testtypename+'.json'):
-            # missed=('/home/cintiq/Desktop/campylobacterjejuni/mist/bin/Release/MIST.exe', '-b',
             missed=('mist', '-b',
                     '-j', outpath+strain+testtypename+'.json',
                     '-a', alleles,
@@ -43,14 +43,15 @@ def mistargs(fastalist, outpath, testtypename, testtype, alleles):
 
 def testnamegetter(testtype):
     with open(testtype, 'r') as f:
-        try: #try accessing markers file as .json file first
+        try:
             data = json.load(f)
             for genome, keys in data.items():
                 for key in keys:
                     if re.match('T(est)?\.?[-\._ ]?Name.*', key, flags=re.IGNORECASE):
                         return keys[key]
 
-        except KeyError: #if access as .json file fails, try to access as csv file
+        except ValueError: #if access as .json file fails, try to access as csv file
+            f.seek(0)
             reader=csv.reader(f, delimiter='\t')
             next(reader, None)
             for x in reader:
@@ -62,8 +63,6 @@ def runmist(missed, outpath, strain):
         os.mkdir(outpath+'temp/'+strain+'/')
     subprocess.call(missed)
     shutil.rmtree(outpath+'temp/'+strain+'/')
-
-
 
 
 
