@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+# takes in a directory of paired end fastQs and runs through spades, quast, 
+# prokka, roary, and MIST
 import os
 import trimgalorepipe
 import argparse
@@ -11,8 +13,8 @@ import mistpipe
 from multiprocessing import cpu_count
 
 
-def run_trimgalore(path, outpath):
-    trimgalorepipe.process(path, outpath)
+def run_trimgalore(path, outpath, cores):
+    trimgalorepipe.process(path, outpath, cores)
 
 def run_kraken():
     '''Formats Kraken args and runs kraken'''
@@ -60,7 +62,7 @@ def arguments():
 
 def main():
     args = arguments()
-    run_trimgalore(args.trimin, args.trimout)
+    run_trimgalore(args.trimin, args.trimout, args.cores)
     run_spades(args.trimout, args.spadesout, args.fasta, str(args.cores))
     run_quast(args.fasta, args.quastout, str(args.cores))
     run_mist(args.fasta, args.mistout, args.marker, args.alleles, args.cores)
