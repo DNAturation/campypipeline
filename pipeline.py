@@ -88,7 +88,8 @@ def arguments():
 
 
 def main():
-    start = time.clock()
+    startp = time.clock()
+    startt = time.time()
     args = arguments()
     # if subparser:
         # pass
@@ -107,8 +108,7 @@ def main():
     run_prokka(args.fasta, args.namestripperout, args.prokkaout, str(args.cores))
     print('Creating pangenome')
     run_roary(args.prokkaout, args.roaryout, args.roarysym, str(args.cores))
-    end = time.clock()
-    print('Pipeline ran for {} seconds'.format(end-start))
+    print('Pipeline ran for {} seconds (process time), {} seconds in real-time'.format(time.clock()-startp, time.time()-startt))
 
 
 if __name__ == '__main__':
