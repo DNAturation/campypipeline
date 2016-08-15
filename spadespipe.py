@@ -59,8 +59,8 @@ def format_spades_args(strain_names, file_pairs, output_dir, fastaout, threads):
                '--threads', threads
                )
 
-        src = '{out}/{strain}/contigs.fasta'.format(out=output_dir, strain=strain)
-        dst = '{fout}/{strain}.fasta'.format(fout=fastaout, strain=strain)
+        src = os.path.join(output_dir, strain, 'contigs.fasta')
+        dst = os.path.join(fastaout, strain+'.fasta')
 
         yield spades, src, dst
 
@@ -79,8 +79,8 @@ def arguments():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-o', '--outpath', default='./temprawout', help='output directory for all files')
-    parser.add_argument('-f', '--fastaout', default='./fasta/', help='output directory for fastas')
+    parser.add_argument('-o', '--outpath', default='spadesout/', help='output directory for all files')
+    parser.add_argument('-f', '--fastaout', default='fasta/', help='output directory for fastas')
     parser.add_argument('-t', '--threads', type=int, default=cpu_count())
     parser.add_argument('path', help='directory of fastqs for input')
 

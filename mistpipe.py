@@ -13,8 +13,9 @@ import json
 
 def getfasta(path):
     fastalist = []
-    for dir in path:
-        filelist = glob.glob(os.path.join(dir, '*.fasta'))  # path is a list of directories due to nargs argument
+    for direc in path:
+        filelist = glob.glob(os.path.join(direc, '*.fasta'))  # path is a list of directories due to nargs argument
+        print(path)
         for file in filelist:
             fastalist.append(file)
     return fastalist

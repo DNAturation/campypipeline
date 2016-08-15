@@ -7,7 +7,7 @@ import subprocess
 from multiprocessing import cpu_count
 
 def input_strains(fasta_path):
-    for v in glob.glob(fasta_path + '*.fasta'):
+    for v in glob.glob(os.path.join(fasta_path, '*.fasta')):
         yield v, os.path.splitext(os.path.basename(v))[0]
 
 def pathfinder(outdir):

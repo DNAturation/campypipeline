@@ -15,15 +15,27 @@ def pathfinder(outpath):
 
 
 def trimargP(forward, reverse, outpath):
-    trims = ('/home/phac/Bryce/GenomeAssembler/bin/trim_galore/trim_galore',
-             '-o', outpath,
-             '--paired',
-             forward, reverse)
+    fbase = os.path.splitext(os.path.basename(forward))[0]
+    rbase = os.path.splitext(os.path.basename(reverse))[0]
+    fv1 = os.path.isfile(os.path.join(outpath, fbase+'_val_1.fastq'))
+    fv2 = os.path.isfile(os.path.join(outpath, fbase+'_val_2.fastq'))
+    rv1 = os.path.isfile(os.path.join(outpath, rbase+'_val_1.fastq'))
+    rv2 = os.path.isfile(os.path.join(outpath, rbase+'_val_2.fastq'))
+    if ((fv1 or fv2) and (rv1 or rv2)):
+        trims = False
+    else:
+        trims = ('/home/phac/Bryce/GenomeAssembler/bin/trim_galore/trim_galore',
+                 '-o', outpath,
+                 '--paired',
+                 forward, reverse)
     return trims
 
 def runtrimP(forward, reverse, outpath):
     trims = trimargP(forward, reverse, outpath)
-    subprocess.call(trims)
+    if trims:
+        subprocess.call(trims)
+    else:
+        print('skipping', os.path.splitext(os.path.basename(forward))[0], 'due to file already existing')
 
 def rename(outpath):
     outlist = glob.glob(outpath + '*.fq')
@@ -52,7 +64,7 @@ def process(path, outpath, cores):
 
 def main():
     args = arguments()
-    process(args.path, args.outpath)
+    process(args.path, args.outpath, args.cores)
 
 if __name__ == '__main__':
     main()

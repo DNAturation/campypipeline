@@ -20,6 +20,7 @@ def dictionary(file):
         for record in SeqIO.parse(f, 'fasta'):
             d[record.id] = str(record.seq)
     for i, v in enumerate(sorted(d)):
+        print(str(i))
         prokkafriendlyd[strain + str(i).zfill(5)] = d[v]
     return prokkafriendlyd
 
@@ -51,10 +52,10 @@ def strain_name(st):
 def process(path, outpath):
 
     pathfinder(outpath)
-    x = glob.glob(path+'*.fasta')
-    for a in x:
-        strain = strain_name(a)
-        pfd = dictionary(a)
+    fastafiles = glob.glob(path+'*.fasta')
+    for file in fastafiles:
+        strain = strain_name(file)
+        pfd = dictionary(file)
         record = seqobject(pfd)
         writer(record, outpath, strain)
 
