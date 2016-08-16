@@ -14,19 +14,18 @@ def pathfinder(outdir):
     if not os.access(outdir, os.F_OK):
         os.mkdir(outdir)
 
-def prokkargs(strain, fasta, outpath, cores):
-    prok = ('prokka',
-            '--outdir', outpath + strain,
+def prokkargs(prokkacall, strain, fasta, outpath, cores):
+    prok = prokkacall + ['--outdir', outpath + strain,
             '--locustag', strain,
             '--prefix', strain,
             '--cpus', str(cores),
-            fasta)
+            fasta]
 
     return prok
 
-def runprokka(strain, fasta, outpath, cores):
+def runprokka(prokkacall, strain, fasta, outpath, cores):
 
-    prok = prokkargs(strain, fasta, outpath, cores)
+    prok = prokkargs(prokkacall, strain, fasta, outpath, cores)
     subprocess.call(prok)
 
 def arguments():
@@ -35,20 +34,21 @@ def arguments():
 
     parser.add_argument('-o', '--outpath', default='./prokka/')
     parser.add_argument('-c', '--cpus', type=int, default=cpu_count())
+    parser.add_argument('--prokkacall', nargs='+', default=['prokka'])
     parser.add_argument('path', default='./prokka/*-')
 
     return parser.parse_args()
 
-def process(path, outpath, cpus):
+def process(prokkacall, path, outpath, cpus):
     pathfinder(outpath)
 
     for fasta, strain in input_strains(path):
-        runprokka(strain, fasta, outpath, cpus)
+        runprokka(prokkacall, strain, fasta, outpath, cpus)
 
 def main():
 
     args = arguments()
-    process(args.path, args.outpath, args.cpus)
+    process(args.prokkacall, args.path, args.outpath, args.cpus)
 
 if __name__ == '__main__':
     main()

@@ -25,13 +25,12 @@ def inputfastqs(path):
     return[t for t in pairs]
 
 
-
-
 def namer(fast1):
     '''gets strain names'''
     strain, extension = os.path.splitext(os.path.basename(fast1))
     Strain_Name = strain[:-6]
     return Strain_Name
+
 
 def pathfinder(Output_Dir):
     if not os.access(Output_Dir, os.F_OK):
@@ -43,31 +42,29 @@ def fastapath(fasta):
         os.mkdir(fasta)
 
 
-
 def get_strain_names(file):
     '''retrieves strain names from the paired tuples'''
     return (namer(x[0]) for x in file)
 
-def format_spades_args(strain_names, file_pairs, output_dir, fastaout, threads):
+
+def format_spades_args(spadescall, strain_names, file_pairs, output_dir, fastaout, threads):
     '''creates arguments for calling spades, list of tuples'''
     for strain, pair in zip(strain_names, file_pairs):
-        spades = ('spades.py',
-               '-o', '{}/{}'.format(output_dir, strain),
+        spades = spadescall + ['-o', '{}/{}'.format(output_dir, strain),
                '-1', pair[0],
                '-2', pair[1],
                '--careful',
-               '--threads', threads
-               )
+               '--threads', threads]
 
         src = os.path.join(output_dir, strain, 'contigs.fasta')
         dst = os.path.join(fastaout, strain+'.fasta')
 
         yield spades, src, dst
 
-def run_spades(strain_names, file_pairs, output_dir, fastaout, threads):
+def run_spades(spadescall, strain_names, file_pairs, output_dir, fastaout, threads):
     '''runs spades on the provided arguments from spades args; if fasta file for strain
      already exists, skips the file'''
-    for spades, src, dst in format_spades_args(strain_names, file_pairs, output_dir, fastaout, str(threads)):
+    for spades, src, dst in format_spades_args(spadescall, strain_names, file_pairs, output_dir, fastaout, str(threads)):
         if not os.path.isfile(dst):
 
             subprocess.call(spades)
@@ -82,24 +79,25 @@ def arguments():
     parser.add_argument('-o', '--outpath', default='spadesout/', help='output directory for all files')
     parser.add_argument('-f', '--fastaout', default='fasta/', help='output directory for fastas')
     parser.add_argument('-t', '--threads', type=int, default=cpu_count())
+    parser.add_argument('--spadescall', nargs='+', default=['spades.py'])
     parser.add_argument('path', help='directory of fastqs for input')
 
     return parser.parse_args()
 
-def process(path, outpath, fastaout, threads):
+def process(spadescall, path, outpath, fastaout, threads):
     if not os.access(path, os.F_OK):
         print ('Error: FastQ directory not found')
     pathfinder(outpath)
     fastapath(fastaout)
     file_pairs = inputfastqs(path)
     names = get_strain_names(file_pairs)
-    run_spades(names, file_pairs, outpath, fastaout, threads)
+    run_spades(spadescall, names, file_pairs, outpath, fastaout, threads)
 
 
 def main():
 
     args = arguments()
-    process(args.path, args.outpath, args.fastaout, args.threads)
+    process(args.spadescall, args.path, args.outpath, args.fastaout, args.threads)
 
 
 if __name__ == '__main__':

@@ -40,20 +40,17 @@ def pathfinder(out_dir):
         os.mkdir(out_dir)
 
 
-def roaryargs(threads, out_dir, temp, copyletter):
+def roaryargs(roarycall, threads, out_dir, temp, copyletter):
     '''grabs all symlinked files, and organizes them into a space delimited string for input into roary'''
-    files = glob.glob(os.path.join(temp, '*.gff'))
-    roaryargs = ['roary',
-                '-p', str(threads),
+    files = glob.glob(os.path.join(temp+copyletter, '*.gff'))
+    roaryargs = roarycall + ['-p', str(threads),
                 '-f', out_dir] + files
 
     return roaryargs
 
-def runroary(threads, out_dir, temp, copyletter):
+def runroary(roarycall, threads, out_dir, temp, copyletter):
 
-    subprocess.call(roaryargs(threads, out_dir, temp, copyletter))
-
-
+    subprocess.call(roaryargs(roarycall, threads, out_dir, temp, copyletter))
 
 
 def arguments():
@@ -63,20 +60,21 @@ def arguments():
     parser.add_argument('-o', '--outpath', default='roaryout/')
     parser.add_argument('-t', '--temp', default='gffs/')
     parser.add_argument('-p', '--processors', type=int, default=cpu_count())
+    parser.add_argument('--roarycall', nargs='+', default=['roary'])
     parser.add_argument('path')
 
     return parser.parse_args()
 
-def process(path, outpath, temp, processors):
+def process(roarycall, path, outpath, temp, processors):
     pathfinder(outpath)
 
     copyletter = gff(path, temp)
-    runroary(processors, outpath, temp, copyletter)
+    runroary(roarycall, processors, outpath, temp, copyletter)
 
 
 def main():
     args = arguments()
-    process(args.path, args.outpath, args.temp, args.processors)
+    process(args.roarycall, args.path, args.outpath, args.temp, args.processors)
 
 
 if __name__ == '__main__':

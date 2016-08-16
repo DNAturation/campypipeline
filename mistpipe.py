@@ -15,7 +15,6 @@ def getfasta(path):
     fastalist = []
     for direc in path:
         filelist = glob.glob(os.path.join(direc, '*.fasta'))  # path is a list of directories due to nargs argument
-        print(path)
         for file in filelist:
             fastalist.append(file)
     return fastalist
@@ -28,16 +27,16 @@ def pathfinder(outpath):
         os.mkdir(outpath+'temp/')
 
 
-def mistargs(fastalist, outpath, testtypename, testtype, alleles):
+def mistargs(mistcall, fastalist, outpath, testtypename, testtype, alleles):
     for file in fastalist:
         strain, extension = os.path.splitext(os.path.basename(file))
         if not os.path.isfile(outpath+strain+testtypename+'.json'):
-            missed=('mist', '-b',
+            missed = mistcall + ['-b',
                     '-j', outpath+strain+testtypename+'.json',
                     '-a', alleles,
                     '-t', testtype,
                     '-T', outpath+'temp/'+strain+'/',
-                    file)
+                    file]
             yield missed, strain
         else:
             print('skipping strain '+strain+' due to .json file for this test already existing')
@@ -74,16 +73,17 @@ def arguments():
     parser.add_argument('-a', '--alleles', default='alleles/')
     parser.add_argument('-t', '--testtype', required=True, help='path to and type of test/markers file, ex. CGF119')
     parser.add_argument('-c', '--cores', default=multiprocessing.cpu_count(), help='number of cores to run on')
+    parser.add_argument('--mistcall', nargs='+', default=['mist'])
     parser.add_argument('path', nargs='+')
     return parser.parse_args()
 
 
-def process(path, outpath, testtype, alleles, cores):
+def process(mistcall, path, outpath, testtype, alleles, cores):
     listlist = getfasta(path)
     testtypename=testnamegetter(testtype)
     pool = multiprocessing.Pool(int(cores))
     pathfinder(outpath)
-    margs = mistargs(listlist, outpath, testtypename, testtype, alleles)
+    margs = mistargs(mistcall, listlist, outpath, testtypename, testtype, alleles)
     for missed, strain in margs:
         pool.apply_async(runmist, args=(missed, outpath, strain))
     pool.close()
@@ -92,7 +92,7 @@ def process(path, outpath, testtype, alleles, cores):
 
 def main():
     args = arguments()
-    process(args.path, args.outpath, args.testtype, args.alleles, args.cores)
+    process(args.mistcall, args.path, args.outpath, args.testtype, args.alleles, args.cores)
 
 if __name__ == '__main__':
     main()

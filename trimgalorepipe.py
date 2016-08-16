@@ -14,7 +14,7 @@ def pathfinder(outpath):
         os.mkdir(outpath)
 
 
-def trimargP(forward, reverse, outpath):
+def trimargP(trimcall, forward, reverse, outpath):
     fbase = os.path.splitext(os.path.basename(forward))[0]
     rbase = os.path.splitext(os.path.basename(reverse))[0]
     fv1 = os.path.isfile(os.path.join(outpath, fbase+'_val_1.fastq'))
@@ -22,16 +22,15 @@ def trimargP(forward, reverse, outpath):
     rv1 = os.path.isfile(os.path.join(outpath, rbase+'_val_1.fastq'))
     rv2 = os.path.isfile(os.path.join(outpath, rbase+'_val_2.fastq'))
     if ((fv1 or fv2) and (rv1 or rv2)):
-        trims = False
+        trims = None
     else:
-        trims = ('/home/phac/Bryce/GenomeAssembler/bin/trim_galore/trim_galore',
-                 '-o', outpath,
+        trims = trimcall + ['-o', outpath,
                  '--paired',
-                 forward, reverse)
+                 forward, reverse]
     return trims
 
-def runtrimP(forward, reverse, outpath):
-    trims = trimargP(forward, reverse, outpath)
+def runtrimP(trimcall, forward, reverse, outpath):
+    trims = trimargP(trimcall, forward, reverse, outpath)
     if trims:
         subprocess.call(trims)
     else:
@@ -47,10 +46,11 @@ def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--cores', default='multiprocessing.cpu_count()')
     parser.add_argument('-o', '--outpath', default='./cleanfastq/')
+    parser.add_argument('--trimcall', nargs='+', default=['/home/phac/Bryce/GenomeAssembler/bin/trim_galore/trim_galore'])
     parser.add_argument('path')
     return parser.parse_args()
 
-def process(path, outpath, cores):
+def process(trimcall, path, outpath, cores):
     fastqinput = getfastq(path)
     pathfinder(outpath)
     pool = multiprocessing.Pool(int(cores))
@@ -64,7 +64,7 @@ def process(path, outpath, cores):
 
 def main():
     args = arguments()
-    process(args.path, args.outpath, args.cores)
+    process(args.trimcall, args.path, args.outpath, args.cores)
 
 if __name__ == '__main__':
     main()
