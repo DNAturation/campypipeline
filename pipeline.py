@@ -167,7 +167,6 @@ def arguments():
 
 
 def main():
-    startp = time.clock()
     startt = time.time()
     configdefault()
     args = arguments()
@@ -188,7 +187,7 @@ def main():
         run_prokka(prokkacall, args.fasta, args.namestripperout, args.prokkaout, str(args.cores))
         print('Creating pangenome')
         run_roary(roarycall, args.prokkaout, args.roaryout, args.roarysym, str(args.cores))
-        print('Pipeline ran for {} seconds (process time), {} seconds in real-time'.format(time.clock()-startp, time.time()-startt))
+        print('Pipeline ran for {} seconds'.format(time.time()-startt))
 
 
 if __name__ == '__main__':
