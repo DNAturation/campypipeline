@@ -55,7 +55,7 @@ def process(trimcall, path, outpath, cores):
     pathfinder(outpath)
     pool = multiprocessing.Pool(int(cores))
     for forward, reverse in zip(fastqinput[0::2], fastqinput[1::2]):
-        pool.apply_async(runtrimP, args=(forward, reverse, outpath))
+        pool.apply_async(runtrimP, args=(trimcall, forward, reverse, outpath))
     pool.close()
     pool.join()
     rename(outpath)
