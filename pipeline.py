@@ -46,6 +46,10 @@ def run_roary(roarycall, path, outpath, temp, processors):
     roarypipe.process(roarycall, path, outpath, temp, processors)
 
 def configdefault():
+    '''
+    Creates default configuration file if one is not found. These settings are the locations of the programs on
+    Kashyyyk, which this was developed using
+    '''
     if not os.path.isfile('pipelineconfig.json'):
         print('Creating default configs file')
         configdefaults={
@@ -60,6 +64,7 @@ def configdefault():
             json.dump(configdefaults, f)
 
 def configreader():
+    '''Reads the config file and returns all the file paths for the other programs.'''
     with open('pipelineconfig.json', 'r') as f:
         configs=json.load(f)
         trimcall=configs['trimgalore']
@@ -168,7 +173,7 @@ def arguments():
 
 def main():
     startt = time.time()
-    configdefault()
+    configdefault() #automatically tries to create default config file if non are present
     args = arguments()
     if args.subfunction == 'config':
         configwriter(args.trimgalore, args.spades, args.prokka, args.quast, args.roary, args.mist)
