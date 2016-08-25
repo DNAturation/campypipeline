@@ -14,36 +14,35 @@ import prokkapipe
 import roarypipe
 import quastpipe
 import mistpipe
+import mistdistrept
 from multiprocessing import cpu_count
 
 
 def run_trimgalore(trimcall, path, outpath, cores):
     trimgalorepipe.process(trimcall, path, outpath, cores)
 
-def run_kraken():
-    '''Formats Kraken args and runs kraken'''
-
-    pass
-
 
 def run_spades(spadescall, spadesin, spadesout, spadesfastaout, threads):
     spadespipe.process(spadescall, spadesin, spadesout, spadesfastaout, threads)
 
-def run_mist(mistcall, path, outpath, testtype, alleles, cores):
+
+def run_mist(mistcall, path, outpath, testtype, alleles, reportfile, cores):
     mistpipe.process(mistcall, path, outpath, testtype, alleles, cores)
+    mistdistrept.process(outpath, outpath, reportfile, testtype, cores)
+
 
 def run_quast(quastcall, path, outpath, threads):
     quastpipe.process(quastcall, path, outpath, threads)
+
 
 def run_prokka(prokkacall, nin, nout, prokout, threads):
     namestripper.process(nin, nout)
     prokkapipe.process(prokkacall, nout, prokout, threads)
 
-def run_panseq():
-    pass
 
 def run_roary(roarycall, path, outpath, temp, processors):
     roarypipe.process(roarycall, path, outpath, temp, processors)
+
 
 def configdefault():
     '''
@@ -63,6 +62,7 @@ def configdefault():
         with open('pipelineconfig.json', 'w') as f:
             json.dump(configdefaults, f)
 
+
 def configreader():
     '''Reads the config file and returns all the file paths for the other programs.'''
     with open('pipelineconfig.json', 'r') as f:
@@ -74,6 +74,7 @@ def configreader():
         roarycall=configs['roary']
         mistcall=configs['mist']
     return trimcall, spadescall, prokkacall, quastcall, roarycall, mistcall
+
 
 def configwriter(trim, spades, prokka, quast, roary, mist):
     '''
@@ -126,6 +127,7 @@ def configwriter(trim, spades, prokka, quast, roary, mist):
     with open('pipelineconfig.json', 'w') as g:
         json.dump(configs, g)
 
+
 def arguments():
     parser = argparse.ArgumentParser(description='takes in commands of "run" for running through the pipeline, or "config" for setting up the run commands for the programs')
     subparsers = parser.add_subparsers(dest='subfunction')
@@ -152,6 +154,7 @@ def arguments():
     run_parser.add_argument('--mistout', default='mistout/')
     run_parser.add_argument('-m', '--marker', help='path to and name of .markers file being run')
     run_parser.add_argument('-a', '--alleles', help='folder for alleles files')
+    run_parser.add_argument('--report', default='mistreport.json', help='name of the report file')
 
     run_parser.add_argument('--assembled', action='store_false', help='flag to set if the inputs are already assembled; skips trimgalore and spades. If using this flag, please also use -f to set input path of fastas')
     run_parser.add_argument('-c', '--cores', type=int, default=cpu_count())
@@ -187,7 +190,7 @@ def main():
         print('Generating quality report')
         run_quast(quastcall, args.fasta, args.quastout, str(args.cores))
         print('Running MIST')
-        run_mist(mistcall, [args.fasta], args.mistout, args.marker, args.alleles, args.cores)
+        run_mist(mistcall, [args.fasta], args.mistout, args.marker, args.alleles, args.report, args.cores)
         print('Annotating genes')
         run_prokka(prokkacall, args.fasta, args.namestripperout, args.prokkaout, str(args.cores))
         print('Creating pangenome')
