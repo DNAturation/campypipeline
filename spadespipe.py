@@ -1,4 +1,4 @@
-#takes in fastq files that have had their adapters trimmed by trimgalore and
+#takes in a directory of fastq files that have had their adapters trimmed by trimgalore and
 # runs spades on them, outputting fasta files
 
 import argparse
@@ -10,7 +10,7 @@ from multiprocessing import cpu_count
 
 def inputfastqs(path):
     '''grabs fastq files from input path and sorts them into forward and reverse pair tuples'''
-    listoffastq=glob.glob(path+'*.fastq')
+    listoffastq=glob.glob(os.path.join(path, '*'))
     pairs = []
     for i, v in enumerate(listoffastq):
         for match in range(i+1, len(listoffastq)):
@@ -62,8 +62,10 @@ def format_spades_args(spadescall, strain_names, file_pairs, output_dir, fastaou
         yield spades, src, dst
 
 def run_spades(spadescall, strain_names, file_pairs, output_dir, fastaout, threads):
-    '''runs spades on the provided arguments from spades args; if fasta file for strain
-     already exists, skips the file'''
+    '''
+    runs spades on the provided arguments from spades args; if fasta file for strain
+    already exists, skips the file
+    '''
     for spades, src, dst in format_spades_args(spadescall, strain_names, file_pairs, output_dir, fastaout, str(threads)):
         if not os.path.isfile(dst):
 

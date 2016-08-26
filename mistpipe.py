@@ -28,9 +28,10 @@ def pathfinder(outpath):
 
 
 def mistargs(mistcall, fastalist, outpath, testtypename, testtype, alleles):
+    '''formats arguments for calling MIST. as a list due to mistcall being a list'''
     for file in fastalist:
         strain, extension = os.path.splitext(os.path.basename(file))
-        if not os.path.isfile(outpath+strain+testtypename+'.json'):
+        if not os.path.isfile(os.path.join(outpath, strain+testtypename+'.json')):  # make sure not to repeat analyzing a genome
             missed = mistcall + ['-b',
                     '-j', outpath+strain+testtypename+'.json',
                     '-a', alleles,
@@ -42,6 +43,7 @@ def mistargs(mistcall, fastalist, outpath, testtypename, testtype, alleles):
             print('skipping strain '+strain+' due to .json file for this test already existing')
 
 def testnamegetter(testtype):
+    '''Grabs the name of the test being run from the markers file'''
     with open(testtype, 'r') as f:
         try:
             data = json.load(f)
@@ -60,9 +62,9 @@ def testnamegetter(testtype):
 
 def runmist(missed, outpath, strain):
     if not os.access(outpath+'temp/'+strain+'/', os.F_OK):
-        os.mkdir(outpath+'temp/'+strain+'/')
+        os.mkdir(os.path.join(outpath, 'temp/', strain))
     subprocess.call(missed)
-    shutil.rmtree(outpath+'temp/'+strain+'/')
+    shutil.rmtree(os.path.join(outpath, 'temp', strain+'/'))  # deletes temp folder for MIST which can get big. Not necessary if using the altered version of MIST
 
 
 

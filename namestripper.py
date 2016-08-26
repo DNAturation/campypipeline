@@ -13,19 +13,18 @@ import glob
 def dictionary(file):
 
     d={}
-    prokkafriendlyd={}
+    prokkafriendlyd={}  # stores the new fasta name-sequence pairs
 
     strain = strain_name(file)
-    with open(file, 'r') as f:
+    with open(file, 'r') as f:  # opens each assembled genome file
         for record in SeqIO.parse(f, 'fasta'):
             d[record.id] = str(record.seq)
     for i, v in enumerate(sorted(d)):
-        print(str(i))
-        prokkafriendlyd[strain + str(i).zfill(5)] = d[v]
+        prokkafriendlyd[strain + str(i).zfill(5)] = d[v]  # fills in the end with 5 digits
     return prokkafriendlyd
 
 def seqobject(pfd):
-    record = ([SeqRecord(Seq(pfd[k], IUPAC.unambiguous_dna), id=k) for k in sorted(pfd)])
+    record = ([SeqRecord(Seq(pfd[k], IUPAC.unambiguous_dna), id=k) for k in sorted(pfd)])  # turns the dictionary into a record object for writing to a fasta file
     return record
 
 def pathfinder(outdir):

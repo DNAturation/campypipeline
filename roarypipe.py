@@ -7,10 +7,14 @@ import os
 import subprocess
 import string
 from multiprocessing import cpu_count
+import shutil
 
 def gff(path, temp):
-    '''grabs list of .gff files from multiple strains output by prokka, symlinks them into a temp folder;
-    if symlink folder already exists, tries a new folder'''
+    '''
+    grabs list of .gff files from multiple strains output by prokka, symlinks them into a temp folder;
+    if symlink folder already exists, tries a new folder. Added because this generally is an intermediate step that may
+    not be checked and emptied like the others
+    '''
     listofiles = glob.glob(os.path.join(path, '*/*.gff'))
     filenames = [os.path.basename(file) for file in listofiles]
     listofattempts = ['']+list(string.ascii_lowercase)

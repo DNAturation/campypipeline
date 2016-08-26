@@ -1,1 +1,1 @@
-# didactic-garbanzo
+Pipeline for running a set of reads through spades, and then MIST, quast, prokka, and roary

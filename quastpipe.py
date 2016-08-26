@@ -8,7 +8,7 @@ import glob
 from multiprocessing import cpu_count
 
 def inputfasta(path):
-    listoffasta=glob.glob(path+'*.fasta')
+    listoffasta=glob.glob(os.path.join(path, '*.fasta'))
     return listoffasta
 
 def pathfinder(Output_Dir):
@@ -16,9 +16,9 @@ def pathfinder(Output_Dir):
         os.mkdir(Output_Dir)
 
 
-def straingetter(listoffasta, path):
+def straingetter(listoffasta):
     for filename in listoffasta:
-        strainname = filename[len(path):-6]
+        strainname = os.path.splitext(os.path.basename(filename))[0]
         yield strainname
 
 
@@ -47,7 +47,7 @@ def arguments():
 def process(quastcall, path, outpath, threads):
     pathfinder(outpath)
     infa = inputfasta(path)
-    strain_name = straingetter(infa, path)
+    strain_name = straingetter(infa)
     run_quast(quastcall, infa, strain_name, outpath, threads)
 
 

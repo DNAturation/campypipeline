@@ -14,7 +14,7 @@ def pathfinder(outdir):
     if not os.access(outdir, os.F_OK):
         os.mkdir(outdir)
 
-def prokkargs(prokkacall, strain, fasta, outpath, cores):
+def prokkargs(prokkacall, strain, fasta, outpath, cores):  # arguments for calling prokka
     prok = prokkacall + ['--outdir', outpath + strain,
             '--locustag', strain,
             '--prefix', strain,
