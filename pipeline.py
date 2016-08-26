@@ -137,6 +137,7 @@ def arguments():
 
     run_parser.add_argument('--spadesout', default='spadesout/', help='output directory for all files')
     run_parser.add_argument('-f', '--fasta', default='fasta/', help='output directory for fastas')
+    ###block below here isn't implemented yet
     run_parser.add_argument('--spades-sc', default=False, action='store_const', const='--sc', help='flag for single-cell data')
     run_parser.add_argument('--spades-rna', default=False, action='store_const', const='--rna', help='flag for running on RNA')
     run_parser.add_argument('--spades-iontorrent', default=False, action='store_const', const='--iontorrent', help='flag for running on iontorrent data, can take in BAM files')
@@ -144,6 +145,37 @@ def arguments():
     run_parser.add_argument('--spades-only-assembler', default=False, action='store_const', const='--only-assembler', help='runs only the assembly module')
 
     run_parser.add_argument('--quastout', default='quastout/')
+    ###block below here isn't implemented yet
+    run_parser.add_argument('--quast-reference', default=False)
+    run_parser.add_argument('--quast-gene', default=False)
+    run_parser.add_argument('--quast-mincontig', default=False)
+    run_parser.add_argument('--quast-labels', default=False, nargs='+')  # when implementing, add quotation marks around the full argument provided
+    run_parser.add_argument('--quast-L', default=False, action='store_const', const='-L', help='make quast take assembly names from parent directory')
+    run_parser.add_argument('--quast-genefinding', default=False, action='store_const', const='-f', help='turns on quasts genefinding')
+    run_parser.add_argument('--quast-genethresholds', default=False, nargs='+', help='used with genefinding')  # also add quote marks around full argument
+    run_parser.add_argument('--quast-meta', default=False, action='store_const', const='--meta', help='sets Quast to meta mode')
+    run_parser.add_argument('--quast-estrefsize', default=False)
+    run_parser.add_argument('--quast-gage', action='store_const', const='--gage', help='sets Quast to gage mode')
+    run_parser.add_argument('--quast-contigthresholds', default=False, nargs='+')
+    run_parser.add_argument('--quast-scaffolds', default=False, action='store_const', const='--scaffolds', help='tell Quast its running on scaffolds instead of contigs')
+    run_parser.add_argument('--quast-useallalignments', default=False, action='store_const', const='-u')
+    run_parser.add_argument('--quast-minalignment', default=False)
+    run_parser.add_argument('--quast-minidentity', default=False)
+    run_parser.add_argument('--quast-ambiguityusage', default=False, choices=['none', 'one', 'all'])
+    run_parser.add_argument('--quast-ambiguityscore', default=False)
+    run_parser.add_argument('--quast-strictna', default=False, action='store_const', const='--strict-NA')
+    run_parser.add_argument('--quast-extensivemissize', default=False)
+    run_parser.add_argument('--quast-significantpartsize', default=False)
+    run_parser.add_argument('--quast-fragmented', default=False, action='store_const', const='--fragmented')
+    run_parser.add_argument('--quast-silent', default=False, action='store_const', const='--silent')
+    run_parser.add_argument('--quast-nocheck', default=False, action='store_const', const='--no-check')
+    run_parser.add_argument('--quast-noplots', default=False, action='store_const', const='--no-plots')
+    run_parser.add_argument('--quast-nohtml', default=False, action='store_const', const='--no-html')
+    run_parser.add_argument('--quast-noicarus', default=False, action='store_const', const='--no-icarus')
+    run_parser.add_argument('--quast-nosnps', default=False, action='store_const', const='--no-snps')
+    run_parser.add_argument('--quast-nogc', default=False, action='store_const', const='--no-gc')
+    run_parser.add_argument('--quast-nosv', default=False, action='store_const', const='--no-sv')
+    run_parser.add_argument('--quast-fast', default=False, action='store_const', const='--fast')
 
     run_parser.add_argument('--namestripperout', default='prokka/')
     run_parser.add_argument('--prokkaout', default='prokka/')
